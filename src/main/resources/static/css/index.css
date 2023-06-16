@@ -1,0 +1,69 @@
+.container {
+    width: 100%; /* Ancho del div principal */
+    height: 85px;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    border: 1px solid black;
+  }
+  .element > p {
+    margin: 0;
+  }
+  .element > p:first-child {
+    font-size: large;
+    font-weight: bold;
+  }
+  .element {
+    
+    align-items: center;
+    padding: 10px;
+    min-width: 150px; /* Ancho de los elementos */
+    border-right: 1px solid black;
+    animation: moveElements calc(2s * var(--element-count)) linear infinite;
+    display: flex;
+    gap: 2px;
+    align-items: start;
+    flex-direction: column;
+  }
+  
+
+  @keyframes moveElements {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% * var(--element-count)));
+    }
+  }
+  .indices-container {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+  }
+  .indice-element {
+    margin: 10px;
+    width: 350px;
+    padding-bottom: 10px;
+    border: solid 1px black;
+
+    border-radius: 15px;
+  }
+  .card {
+    font-size: x-large;
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    gap: 15px;
+  }
+  .indice-name {
+    font-size: xx-large;
+    text-align: center;
+  }
+  hr {
+    width: 100%;
+    border-top: 8px solid #bbb;
+    border-radius: 5px;
+  }
