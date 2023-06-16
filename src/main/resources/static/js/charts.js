@@ -1,5 +1,12 @@
-//graficos
-function getChartData(json) {
+var listaIndices = {};
+var myChart;
+var myChart2;
+//obtner datos de para el grafico, dependiendo del los indices seleccionados
+function getChartData(indicesSeleccionados) {
+  var indicesFilter = listaIndices.filter(function (objeto) {
+    return indicesSeleccionados.includes(objeto["Nombre"]);
+  });
+
   const labels = [];
   const datasets = [
     {
@@ -17,37 +24,59 @@ function getChartData(json) {
       data: [],
       borderWidth: 1,
     },
-   
   ];
-  for (let i = 0; i < json.length; i++) {
-    datasets[0].data.push(json[i]["Valor"]);
-    datasets[1].data.push(json[i]["Mayor"]);
-    datasets[2].data.push(json[i]["Menor"]);
-    labels.push(json[i]["Nombre"]);
+
+  for (let i = 0; i < indicesFilter.length; i++) {
+    datasets[0].data.push(indicesFilter[i]["Valor"]);
+    datasets[1].data.push(indicesFilter[i]["Mayor"]);
+    datasets[2].data.push(indicesFilter[i]["Menor"]);
+    labels.push(indicesFilter[i]["Nombre"]);
   }
+
   return { labels: labels, datasets: datasets };
 }
 
-function barra() {
-  var container = document.querySelector(".container");
-  var elements = container.querySelectorAll(".element");
-  var containerWidth = container.offsetWidth;
-  var totalElementWidth = 0;
+//obtner datos de para el grafico, dependiendo del los indices seleccionados
+function getChart2Data(indicesSeleccionados) {
 
-  container.style.setProperty("--element-count", elements.length);
-
-  elements.forEach(function (element) {
-    totalElementWidth += element.offsetWidth;
-  });
-
-  var numberOfElements = Math.ceil(containerWidth / totalElementWidth);
-  console.log(numberOfElements);
-
-  for (var i = 0; i < numberOfElements * 2; i++) {
-    elements.forEach(function (element) {
-      var clone = element.cloneNode(true);
-      container.appendChild(clone);
+    var indicesFilter = listaIndices.filter(function (objeto) {
+      return indicesSeleccionados.includes(objeto["Nombre"]);
     });
+  
+    const labels = [];
+    const datasets = [
+      {
+        label: "Variacion",
+        data: [],
+        borderWidth: 1,
+      },
+    
+    ];
+  
+    for (let i = 0; i < indicesFilter.length; i++) {
+      datasets[0].data.push(indicesFilter[i]["Variacion"]);
+      labels.push(indicesFilter[i]["Nombre"]);
+    }
+  
+    return { labels: labels, datasets: datasets };
+  }
+
+
+//actualizar grafico
+function updateChart(indicesSeleccionados) {
+  if (indicesSeleccionados.length === 0) {
+    console.log(getChartData(indicesSeleccionados));
+    myChart.data = getChartData(indicesSeleccionados);
+
+
+    myChart.update();
+  } else {
+    console.log(getChart2Data(indicesSeleccionados))
+
+    myChart.data = getChartData(indicesSeleccionados);
+    myChart.update();
+    myChart2.data = getChart2Data(indicesSeleccionados);
+    myChart2.update();
   }
 }
 
@@ -58,37 +87,87 @@ $(document).ready(function () {
     dataType: "json",
     success: function (response) {
       console.log(response["listaResult"]);
+      listaIndices = response["listaResult"];
 
-      //barra de valores
-      $("body").prepend("<div class='container'></div>");
+      //indices disponibles
+
       for (let index = 0; index < response["listaResult"].length; index++) {
         const element = response["listaResult"][index];
-        $(".container").append(
-          "<div class='element'><p>" +
+
+
+        //lista de indices
+        $(".lista-indices").append(
+          "<li>" +
+            "<input type='checkbox' id=" +
             element["Nombre"] +
-            "</p><p>" +
-            element["Valor"] +
-            "</p><p>" +
-            element["Variacion"] +
-            "</p></div>"
+            " name='items' value=" +
+            element["Nombre"] +
+            " />" +
+            "<label for=" +
+            element["Nombre"] +
+            ">" +
+            element["Nombre"] +
+            "</label>" +
+            "</li>"
         );
       }
-      barra();
+ 
 
-      
+      // datos vacios para inicializar grafico
+      var datosVacios = {
+        labels: [],
+        datasets: [
+          {
+            label: "",
+            data: [],
+            borderWidth: 1,
+          },
+        ],
+      };
 
-      const ctx = document.getElementById("myChart");
-      new Chart(ctx, {
+      // Iniciar grafico1 vacio
+      myChart = new Chart(document.getElementById("myChart"), {
         type: "bar",
-        data: getChartData(response["listaResult"]),
-
+        data: datosVacios,
+        responsive: true,
         options: {
+          indexAxis: "y", // Configurar el eje de índice como el eje y
           scales: {
             y: {
-              beginAtZero: true,
+              beginAtZero: true, // Empezar en cero en el eje y
             },
           },
         },
+      });
+
+
+      // Iniciar grafico2 vacio
+      myChart2 = new Chart(document.getElementById("myChart2"), {
+        type: "bar",
+        data: datosVacios,
+        responsive: true,
+        options: {
+          indexAxis: "x", // Configurar el eje de índice como el eje y
+          scales: {
+            x: {
+              beginAtZero: true, // Empezar en cero en el eje y
+            },
+          },
+        },
+      });
+
+
+
+      //listner para las indices seleccionados
+      $('input[name="items"]').change(function () {
+        var selectedItems = [];
+
+        $('input[name="items"]:checked').each(function () {
+          var label = $('label[for="' + $(this).attr("id") + '"]').text();
+          selectedItems.push(label);
+        });
+
+        updateChart(selectedItems);
       });
     },
   });

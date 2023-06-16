@@ -30,6 +30,10 @@ function barra() {
         console.log(response["listaResult"]);
         $("body").prepend("<div class='container'></div>");
         for (let index = 0; index < response["listaResult"].length; index++) {
+
+
+
+            
           const element = response["listaResult"][index];
           $(".container").append(
             "<div class='element'><p>" +
