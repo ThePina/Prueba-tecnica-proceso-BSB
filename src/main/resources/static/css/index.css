@@ -27,7 +27,7 @@ h2 {
   }
 .container {
   background-color: black;
-  color: greenyellow;
+
   width: 100vw; /* Ancho del div principal */
   height: 85px;
   display: flex;
@@ -145,9 +145,6 @@ label{
     justify-content: start;
 }
 
-
-
-
 .element {
     min-width: 150px; /* Ancho de los elementos */
     height: 100px; /* Altura de los elementos (opcional) */
@@ -171,6 +168,12 @@ label{
     display: flex;
     flex-direction: row;
     
+  }
+  .negative{
+    color: rgb(222, 51, 51);
+  }
+  .positive{
+    color: greenyellow;
   }
   .content>div:first-child{
     border: 1px solid black;

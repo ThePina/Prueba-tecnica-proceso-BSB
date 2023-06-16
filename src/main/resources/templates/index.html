@@ -8,14 +8,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/css/charts.css}" />
     <script th:src="@{/js/index.js}"></script>
     <script th:src="@{/js/charts.js}"></script>
   </head>
 
   <body>
-
-
     <div class="section">
       <h1>Indices</h1>
       <div class="indices-container"></div>
@@ -24,18 +21,18 @@
       <h1>Graficos</h1>
       <div class="content">
         <div class="lista-indice-container">
-            <h2>Valores</h2>
+          <h2>Indices</h2>
           <ul class="lista-indices"></ul>
         </div>
         <div>
           <div class="section-chart">
             <h2>Valores</h2>
-            <canvas class="chart" id="myChart"></canvas>
+            <canvas class="chart" id="valuesChart"></canvas>
           </div>
 
           <div class="section-chart">
             <h2>Variación</h2>
-            <canvas class="chart" id="myChart2"></canvas>
+            <canvas class="chart" id="variationChart"></canvas>
           </div>
         </div>
       </div>

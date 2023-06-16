@@ -1,10 +1,11 @@
-var listaIndices = {};
-var myChart;
-var myChart2;
-//obtner datos de para el grafico, dependiendo del los indices seleccionados
-function getChartData(indicesSeleccionados) {
-  var indicesFilter = listaIndices.filter(function (objeto) {
-    return indicesSeleccionados.includes(objeto["Nombre"]);
+var indexList = {};
+var valuesChart;
+var variationChart;
+
+//obtner datos de para el grafico1, dependiendo del los indices seleccionados
+function getChartValues(selectedIndex) {
+  var indexFilter = indexList.filter(function (objeto) {
+    return selectedIndex.includes(objeto["Nombre"]);
   });
 
   const labels = [];
@@ -26,74 +27,63 @@ function getChartData(indicesSeleccionados) {
     },
   ];
 
-  for (let i = 0; i < indicesFilter.length; i++) {
-    datasets[0].data.push(indicesFilter[i]["Valor"]);
-    datasets[1].data.push(indicesFilter[i]["Mayor"]);
-    datasets[2].data.push(indicesFilter[i]["Menor"]);
-    labels.push(indicesFilter[i]["Nombre"]);
+  for (let i = 0; i < indexFilter.length; i++) {
+    datasets[0].data.push(indexFilter[i]["Valor"]);
+    datasets[1].data.push(indexFilter[i]["Mayor"]);
+    datasets[2].data.push(indexFilter[i]["Menor"]);
+    labels.push(indexFilter[i]["Nombre"]);
   }
 
   return { labels: labels, datasets: datasets };
 }
 
-//obtner datos de para el grafico, dependiendo del los indices seleccionados
-function getChart2Data(indicesSeleccionados) {
+//obtner datos de para el grafico2, dependiendo del los indices seleccionados
+function getChartVariationData(selectedIndex) {
+  var indexFilter = indexList.filter(function (objeto) {
+    return selectedIndex.includes(objeto["Nombre"]);
+  });
 
-    var indicesFilter = listaIndices.filter(function (objeto) {
-      return indicesSeleccionados.includes(objeto["Nombre"]);
-    });
-  
-    const labels = [];
-    const datasets = [
-      {
-        label: "Variacion",
-        data: [],
-        borderWidth: 1,
-      },
-    
-    ];
-  
-    for (let i = 0; i < indicesFilter.length; i++) {
-      datasets[0].data.push(indicesFilter[i]["Variacion"]);
-      labels.push(indicesFilter[i]["Nombre"]);
-    }
-  
-    return { labels: labels, datasets: datasets };
+  const labels = [];
+  const datasets = [
+    {
+      label: "Variacion",
+      data: [],
+      borderWidth: 1,
+    },
+  ];
+
+  for (let i = 0; i < indexFilter.length; i++) {
+    datasets[0].data.push(indexFilter[i]["Variacion"]);
+    labels.push(indexFilter[i]["Nombre"]);
   }
 
+  return { labels: labels, datasets: datasets };
+}
 
 //actualizar grafico
-function updateChart(indicesSeleccionados) {
-  if (indicesSeleccionados.length === 0) {
-    console.log(getChartData(indicesSeleccionados));
-    myChart.data = getChartData(indicesSeleccionados);
+function updateChart(selectedIndex) {
+  valuesChart.data = getChartValues(selectedIndex);
+  valuesChart.update();
+  variationChart.data = getChartVariationData(selectedIndex);
+  variationChart.update();
 
-
-    myChart.update();
-  } else {
-    console.log(getChart2Data(indicesSeleccionados))
-
-    myChart.data = getChartData(indicesSeleccionados);
-    myChart.update();
-    myChart2.data = getChart2Data(indicesSeleccionados);
-    myChart2.update();
-  }
+  valuesChart.update();
 }
 
 $(document).ready(function () {
+  //peticion para obtener los indices
   $.ajax({
     url: "/api/indices",
     type: "GET",
     dataType: "json",
     success: function (response) {
       console.log(response["listaResult"]);
-      listaIndices = response["listaResult"];
+      indexList = response["listaResult"];
 
       //indices disponibles
 
       for (let index = 0; index < response["listaResult"].length; index++) {
         const element = response["listaResult"][index];
-
 
         //lista de indices
         $(".lista-indices").append(
@@ -111,10 +101,9 @@ $(document).ready(function () {
             "</li>"
         );
       }
- 
 
-      // datos vacios para inicializar grafico
-      var datosVacios = {
+      // datos vacios para inicializar graficos
+      var emptyData = {
         labels: [],
         datasets: [
           {
@@ -125,38 +114,35 @@ $(document).ready(function () {
         ],
       };
 
-      // Iniciar grafico1 vacio
-      myChart = new Chart(document.getElementById("myChart"), {
+      // Iniciar grafico de valores vacio
+      valuesChart = new Chart(document.getElementById("valuesChart"), {
         type: "bar",
-        data: datosVacios,
+        data: emptyData,
         responsive: true,
         options: {
-          indexAxis: "y", // Configurar el eje de índice como el eje y
+          indexAxis: "y",
           scales: {
             y: {
-              beginAtZero: true, // Empezar en cero en el eje y
+              beginAtZero: true,
             },
           },
         },
       });
 
-
-      // Iniciar grafico2 vacio
-      myChart2 = new Chart(document.getElementById("myChart2"), {
+      // Iniciar grafico de variacion vacio
+      variationChart = new Chart(document.getElementById("variationChart"), {
         type: "bar",
-        data: datosVacios,
+        data: emptyData,
         responsive: true,
         options: {
-          indexAxis: "x", // Configurar el eje de índice como el eje y
+          indexAxis: "x",
           scales: {
             x: {
-              beginAtZero: true, // Empezar en cero en el eje y
+              beginAtZero: true,
             },
           },
         },
       });
-
-
 
       //listner para las indices seleccionados
       $('input[name="items"]').change(function () {

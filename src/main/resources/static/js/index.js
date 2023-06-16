@@ -1,4 +1,5 @@
-function barra() {
+//copiar elementos del slider hasta completar la pantalla 2 veces para hacer efecto bucle infinito
+function slider() {
     var container = document.querySelector(".container");
     var elements = container.querySelectorAll(".element");
     var containerWidth = container.offsetWidth;
@@ -22,21 +23,24 @@ function barra() {
   }
 
   $(document).ready(function () {
+
+    //peticion para obtener los indices
     $.ajax({
       url: "/api/indices",
       type: "GET",
       dataType: "json",
       success: function (response) {
-        console.log(response["listaResult"]);
+
+        //iniciar div de el slider
         $("body").prepend("<div class='container'></div>");
+
+
         for (let index = 0; index < response["listaResult"].length; index++) {
-
-
-
-            
           const element = response["listaResult"][index];
+
+          //poner primeros elementos del slider
           $(".container").append(
-            "<div class='element'><p>" +
+            "<div class='element "+(element["Variacion"]<0?"negative":"positive")+"'><p>" +
               element["Nombre"] +
               "</p><p>" +
               element["Valor"] +
@@ -44,6 +48,9 @@ function barra() {
               element["Variacion"] +
               "</p></div>"
           );
+
+
+          //setear los valores de las tarjetas con la informacion de los indices
           $(".indices-container").append(
             "<div class='indice-element'>" +
               "<div class='card'>" +
@@ -68,7 +75,7 @@ function barra() {
           );
         }
 
-        barra();
+        slider();
       },
     });
   });
